@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockTemplateResultData;
@@ -32,9 +33,14 @@ public class BlockTemplate {
 	}
 
 	public BlockTemplate(GetBlockTemplateResultData gbtrd) {
-		blockTemplateTxMap = gbtrd.getTransactions().stream().map(BlockTemplateTx::new)
-				.collect(Collectors.toMap(BlockTemplateTx::getTxId, btTx -> btTx, txBuilderMergeFunction,
-						() -> new ConcurrentHashMap<>(SysProps.HM_INITIAL_CAPACITY_FOR_BLOCK)));
+		if (gbtrd.getTransactions().size() == 0) {
+			blockTemplateTxMap = new ConcurrentHashMap<>(SysProps.HM_INITIAL_CAPACITY_FOR_BLOCK);
+		} else {
+			blockTemplateTxMap = IntStream.range(0, gbtrd.getTransactions().size() - 1)
+					.mapToObj(i -> new BlockTemplateTx(gbtrd.getTransactions().get(i), i))
+					.collect(Collectors.toMap(BlockTemplateTx::getTxId, btTx -> btTx, txBuilderMergeFunction,
+							() -> new ConcurrentHashMap<>(SysProps.HM_INITIAL_CAPACITY_FOR_BLOCK)));
+		}
 		this.height = gbtrd.getHeight();
 	}
 
