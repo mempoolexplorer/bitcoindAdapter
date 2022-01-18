@@ -2,7 +2,6 @@ package com.mempoolexplorer.bitcoind.adapter.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Transaction {
 	private String txId;
@@ -12,23 +11,11 @@ public class Transaction {
 	// BE CAREFUL: THIS FIELD MUST KEPT UPDATED, COULD CHANGE ONCE RECEIVED!!!!
 	private Fees fees;
 	private Long timeInSecs;// Epoch time in seconds since the transaction entered in mempool (set by
-							// bitcoind).
+	// bitcoind).
 	// BE CAREFUL: THIS FIELD MUST KEPT UPDATED, COULD CHANGE ONCE RECEIVED!!!!
 	private TxAncestry txAncestry;
 	private Boolean bip125Replaceable;
 	private String hex;// Raw transaction in hexadecimal
-
-	/**
-	 * Returns all addresses involved in this transaction, address in inputs,
-	 * outputs and duplicated.
-	 * 
-	 */
-	public List<String> listAddresses() {
-		List<String> txInputsAddresses = txInputs.stream().map(txInput -> txInput.getAddressIds())
-				.flatMap(addresses -> addresses.stream()).collect(Collectors.toList());
-		return txOutputs.stream().map(txOutput -> txOutput.getAddressIds()).flatMap(addresses -> addresses.stream())
-				.collect(Collectors.toCollection(() -> txInputsAddresses));
-	}
 
 	public String getTxId() {
 		return txId;

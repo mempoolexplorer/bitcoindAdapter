@@ -158,7 +158,7 @@ public class TxPoolFillerImpl implements TxPoolFiller {
         rawTx.getGetRawTransactionResultData().getVout().stream().forEach(output -> {
             // JSON preserves order. http://www.rfc-editor.org/rfc/rfc7159.txt
             TxOutput txOutput = new TxOutput();
-            txOutput.setAddressIds(output.getScriptPubKey().getAddresses());
+            txOutput.setAddress(output.getScriptPubKey().getAddress());
             txOutput.setAmount(JSONUtils.jsonToAmount(output.getValue()));
             txOutput.setIndex(output.getN());
             tx.getTxOutputs().add(txOutput);
@@ -177,7 +177,7 @@ public class TxPoolFillerImpl implements TxPoolFiller {
                         .get(input.getVout());
 
                 TxInput txInput = new TxInput();
-                txInput.setAddressIds(spentTxOutput.getScriptPubKey().getAddresses());
+                txInput.setAddress(spentTxOutput.getScriptPubKey().getAddress());
                 txInput.setAmount(JSONUtils.jsonToAmount(spentTxOutput.getValue()));
                 txInput.setTxId(input.getTxid());
                 txInput.setVOutIndex(input.getVout());

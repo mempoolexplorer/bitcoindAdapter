@@ -1,10 +1,7 @@
 package com.mempoolexplorer.bitcoind.adapter.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TxInput {
-	private List<String> addressIds = new ArrayList<>();// Several addresses if P2PSH, none if unrecognized script. or
+	private String address;// Can be null
 	// coinBase transaction
 	private Long amount;// In Satoshis.
 	private String txId;// Transaction where output is being spent by this input
@@ -13,12 +10,12 @@ public class TxInput {
 	// transaction
 	private String coinbase;// Coinbase, normally null.
 
-	public List<String> getAddressIds() {
-		return addressIds;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setAddressIds(List<String> addressIds) {
-		this.addressIds = addressIds;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public void setAmount(Long amount) {
@@ -57,7 +54,7 @@ public class TxInput {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("TxInput [addressIds=");
-		builder.append(addressIds);
+		builder.append(address);
 		builder.append(", amount=");
 		builder.append(amount);
 		builder.append(", txId=");
