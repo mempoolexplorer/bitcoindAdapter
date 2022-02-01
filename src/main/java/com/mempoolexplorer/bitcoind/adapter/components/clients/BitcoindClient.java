@@ -1,5 +1,7 @@
 package com.mempoolexplorer.bitcoind.adapter.components.clients;
 
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.EstimateType;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.EstimateSmartFeeResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockTemplateResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolEntry;
@@ -13,7 +15,7 @@ public interface BitcoindClient {
 	GetRawMemPoolNonVerbose getRawMemPoolNonVerbose();
 
 	GetRawMemPoolVerbose getRawMemPoolVerbose();
-	
+
 	GetMemPoolEntry getMempoolEntry(String txId);
 
 	GetBlockTemplateResult getBlockTemplateResult();
@@ -22,10 +24,12 @@ public interface BitcoindClient {
 
 	GetVerboseRawTransactionResult getVerboseRawTransaction(String txId);
 
-	Integer getBlockCount(); 
-	
+	Integer getBlockCount();
+
 	GetBlockResult getBlock(Integer blockHeight);
 
 	GetBlockResult getBlock(String blockHash);
+
+	EstimateSmartFeeResult estimateSmartFee(EstimateType estimateType, int blocks);
 
 }

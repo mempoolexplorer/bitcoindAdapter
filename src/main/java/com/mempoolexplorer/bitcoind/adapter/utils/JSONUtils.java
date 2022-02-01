@@ -12,4 +12,9 @@ public class JSONUtils {
 		return value.movePointRight(8).longValue();
 	}
 
+	// BTC/KiloVirtualByte to Satoshy/VirtualByte
+	public static Double BTCkVbyteToSatVbyte(BigDecimal value) {
+		return value.movePointRight(5).doubleValue();
+	}
+
 }

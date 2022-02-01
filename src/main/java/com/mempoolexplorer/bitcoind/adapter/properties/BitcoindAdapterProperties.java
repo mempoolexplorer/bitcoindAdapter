@@ -11,5 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BitcoindAdapterProperties {
-    private int refreshBTIntervalMilliSec = 5;
+    private int refreshBTIntervalMilliSec = 5000;
+    private int refreshSmartFeesIntervalMilliSec = 60000;
 }

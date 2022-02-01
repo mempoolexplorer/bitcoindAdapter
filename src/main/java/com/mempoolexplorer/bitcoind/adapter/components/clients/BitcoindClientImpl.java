@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.BooleanArrayParamRequest;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.EstimateType;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.GetBlockTemplateRulesParams;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.ObjectArrayParamRequest;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.StringArrayParamRequest;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.EstimateSmartFeeResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockCount;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockHashResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockResult;
@@ -147,6 +149,19 @@ public class BitcoindClientImpl implements BitcoindClient {
 		objectParams.setParams(params);
 
 		return restTemplate.postForObject("/", objectParams, GetMemPoolEntry.class);
+	}
+
+	@Override
+	public EstimateSmartFeeResult estimateSmartFee(EstimateType estimateType, int blocks) {
+		ObjectArrayParamRequest objectParams = new ObjectArrayParamRequest();
+
+		objectParams.setId("11");
+		objectParams.setMethod("estimatesmartfee");
+		List<Object> params = new ArrayList<>();
+		params.add(blocks);
+		params.add(estimateType.name());
+		objectParams.setParams(params);
+		return restTemplate.postForObject("/", objectParams, EstimateSmartFeeResult.class);
 	}
 
 }
