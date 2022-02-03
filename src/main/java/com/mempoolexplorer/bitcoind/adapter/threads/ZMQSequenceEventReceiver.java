@@ -36,7 +36,7 @@ import zmq.ZError;
  */
 @Component
 @Slf4j
-public class ZMQSequenceEventReceiver extends ZMQSequenceEventProcessor {
+public class ZMQSequenceEventReceiver extends StoppableThread {
 
     @Autowired
     private BitcoindProperties bitcoindProperties;
@@ -55,7 +55,7 @@ public class ZMQSequenceEventReceiver extends ZMQSequenceEventProcessor {
             }
             socket.subscribe("sequence");
 
-            while (!endThread) {
+            while (!isFinished()) {
                 // Block until a message is received, there is no gain using a ZMQ.Poller to do
                 // a "select" since there is only one socket.
                 ZMsg msg = ZMsg.recvMsg(socket);

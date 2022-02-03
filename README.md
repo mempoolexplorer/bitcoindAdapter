@@ -69,6 +69,8 @@ dbcache=4000
   Interval in which bitcoindAdapter queries for new BlockTemplate. We does not use "longpoolid" since it does not refresh enough quickly.
 - refreshSmartFeesIntervalSec: "60"
   Interval in which bitcoindAdapter queries for Smart Fee data. By default 1 minute.
+- refreshBCIIntervalMilliSec: "60"
+  Interval in which bitcoindAdapter queries for blockChainInfo. By default 1 minute.
 
 ## REST API
 
@@ -90,4 +92,3 @@ dbcache=4000
 ## ACTUATOR API
 
 You can enter actuator via port `8081` `/actuator/ENDPOINT NAME` (i.e. `health, info`... etc)
-

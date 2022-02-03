@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
-public class ZMQSequenceEventConsumer extends ZMQSequenceEventProcessor {
+public class ZMQSequenceEventConsumer extends StoppableThread {
 
     @Autowired
     private TxPoolContainer txPoolContainer;
@@ -66,7 +66,6 @@ public class ZMQSequenceEventConsumer extends ZMQSequenceEventProcessor {
     @Autowired
     private MempoolSyncedHealthIndicator mempoolSyncedHealthIndicator;
 
-
     private boolean isStarting = true;
 
     // Incoming seqNumber
@@ -78,7 +77,7 @@ public class ZMQSequenceEventConsumer extends ZMQSequenceEventProcessor {
     @Override
     protected void doYourThing() throws InterruptedException {
         try {
-            while (!endThread) {
+            while (!isFinished()) {
                 MempoolSeqEvent event = null;
                 event = blockingQueueContainer.getBlockingQueue().take();
                 log.debug("This is the event: {}", event);
@@ -92,33 +91,13 @@ public class ZMQSequenceEventConsumer extends ZMQSequenceEventProcessor {
     }
 
     private void onEvent(MempoolSeqEvent event) throws InterruptedException {
-        // Checks if BlockTemplateRefresherJob must start. (only when all tx has been
-        // loaded)
-        checkForBTRefresherStart();
         if (isStarting) {
+            Thread.sleep(1000);
             // ResetContainers or Queries full mempool with mempoolSequence number.
             onEventonStarting(event);
             isStarting = false;
         }
         treatEvent(event);
-    }
-
-    // Checks if BlockTemplateRefresherJob must start. (only when all tx has been loaded)
-    private void checkForBTRefresherStart() throws InterruptedException {
-        if (isStarting) {
-            // When starting better stop for 1 second to let ZMQEventQueue to fill. And then
-            // ask for its size==0 to start Job.
-            Thread.sleep(1000);
-            return;
-        }
-        // if no pending Txs or blocks, then we can start job.
-        if (blockingQueueContainer.getBlockingQueue().isEmpty() && (!blockTemplateRefresherJob.isStarted())) {
-            blockTemplateRefresherJob.setStarted(true);
-            log.info("BlockTemplateRefresherJob started");
-            // Execute ASAP. does not matter if scheduller also invokes it. It's thread
-            // safe.
-            blockTemplateRefresherJob.execute();
-        }
     }
 
     private void onEventonStarting(MempoolSeqEvent event) throws InterruptedException {

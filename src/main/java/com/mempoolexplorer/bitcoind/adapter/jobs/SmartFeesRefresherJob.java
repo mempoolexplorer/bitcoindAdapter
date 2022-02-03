@@ -37,8 +37,15 @@ public class SmartFeesRefresherJob {
     @Autowired
     private BitcoindClient bitcoindClient;
 
+    private BitcoindCommunicationChecker bitcoindCommunicationChecker = new BitcoindCommunicationChecker();
+    private boolean started = false;
+
     @Scheduled(fixedDelayString = "${bitcoindadapter.refreshSmartFeesIntervalMilliSec}")
     public void execute() {
+        if (!started) {
+            return;// Do nothing until started.
+        }
+
         try {
             SmartFees smartfees = new SmartFees();
             fillSmartFees(smartfees.getNormalSmartFeeList(), EstimateType.UNSET);
@@ -46,12 +53,15 @@ public class SmartFeesRefresherJob {
             fillSmartFees(smartfees.getConservativeSmartFeeList(), EstimateType.CONSERVATIVE);
             smartFeesContainer.refresh(smartfees);
             log.info("SmartFees refreshed");
+            bitcoindCommunicationChecker.addOk();
         } catch (ResourceAccessException e) {
             log.error("Seems bitcoind is down {}", e.getMessage());
             alarmLogger.addAlarm("Seems bitcoind is down." + e.getMessage());
+            bitcoindCommunicationChecker.addFail();
         } catch (Exception e) {
             alarmLogger.addAlarm("Exception: " + e.getMessage());
             log.error("Exception: ", e);
+            bitcoindCommunicationChecker.addFail();
         }
     }
 

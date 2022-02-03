@@ -1,8 +1,7 @@
 package com.mempoolexplorer.bitcoind.adapter;
 
 import com.mempoolexplorer.bitcoind.adapter.components.factories.exceptions.TxPoolException;
-import com.mempoolexplorer.bitcoind.adapter.threads.ZMQSequenceEventConsumer;
-import com.mempoolexplorer.bitcoind.adapter.threads.ZMQSequenceEventReceiver;
+import com.mempoolexplorer.bitcoind.adapter.threads.MainThread;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +13,6 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * This is the main class where everything is started, uses spring events to
  * know when to start or end the application gracefully. Listen for
@@ -25,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Profile(value = { AppProfiles.DEV, AppProfiles.PROD })
-@Slf4j
 public class AppLifeCycle {
 
     // It seems that Spring aplicaton events are thrown more than once, so these are
@@ -40,10 +36,7 @@ public class AppLifeCycle {
     private String topic;
 
     @Autowired
-    private ZMQSequenceEventReceiver zmqSequenceEventReceiver;
-
-    @Autowired
-    private ZMQSequenceEventConsumer zmqSequenceEventConsumer;
+    private MainThread mainThread;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReadyEvent(ApplicationReadyEvent event) throws TxPoolException {
@@ -70,32 +63,14 @@ public class AppLifeCycle {
         if (isShutingdown)
             return;// No more than once
         isShutingdown = true;
-        log.info("Shuttingdown bitcoindAdapter...");
-        zmqSequenceEventConsumer.shutdown();
-        zmqSequenceEventReceiver.shutdown();
-        schedulerShutdown();
-        log.info("BitcoindAdapter shutdown complete.");
-    }
-
-    private void schedulerShutdown() {
-        log.info("Shuting down bitcoindAdapter scheduler...");
-        log.info("BitcoindAdapter scheduler shutdown complete.");
+        mainThread.finalization();
     }
 
     public void checkInitialization() throws TxPoolException {
         if (onApplicationReadyEvent && onBindingCreatedEvent && !hasInitializated) {
             hasInitializated = true;
-            initialization();
+            mainThread.start();
         }
-    }
-
-    private void initialization() {
-        log.info("bitcoinAdapter ZMQ receiver and consumer are starting...");
-        // We keep the blockingQueue private among producer and consumer.
-        // No size limit. Should be enough fast to not get "full"
-        zmqSequenceEventConsumer.start();
-        zmqSequenceEventReceiver.start();
-        log.info("BitcoinAdapter ZMQ receiver and consumer started.");
     }
 
 }

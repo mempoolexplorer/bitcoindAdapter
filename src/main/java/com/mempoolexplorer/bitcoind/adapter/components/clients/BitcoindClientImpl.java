@@ -9,12 +9,14 @@ import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.GetBlockT
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.ObjectArrayParamRequest;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.requests.StringArrayParamRequest;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.EstimateSmartFeeResult;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockChainInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockCount;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockHashResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockTemplateResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolEntry;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolInfo;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetNetworkInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetRawMemPoolNonVerbose;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetRawMemPoolVerbose;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetVerboseRawTransactionResult;
@@ -164,4 +166,27 @@ public class BitcoindClientImpl implements BitcoindClient {
 		return restTemplate.postForObject("/", objectParams, EstimateSmartFeeResult.class);
 	}
 
+	@Override
+	public GetBlockChainInfo getBlockChainInfo() {
+		StringArrayParamRequest stringParams = new StringArrayParamRequest();
+
+		stringParams.setId("12");
+		stringParams.setMethod("getblockchaininfo");
+		stringParams.setParams(new ArrayList<>());
+
+		return restTemplate.postForObject("/", stringParams, GetBlockChainInfo.class);
+
+	}
+
+	@Override
+	public GetNetworkInfo getNetworkInfo() {
+		StringArrayParamRequest stringParams = new StringArrayParamRequest();
+
+		stringParams.setId("12");
+		stringParams.setMethod("getnetworkinfo");
+		stringParams.setParams(new ArrayList<>());
+
+		return restTemplate.postForObject("/", stringParams, GetNetworkInfo.class);
+
+	}
 }

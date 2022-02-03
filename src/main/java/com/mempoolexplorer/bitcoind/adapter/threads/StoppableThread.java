@@ -6,6 +6,7 @@ import com.mempoolexplorer.bitcoind.adapter.components.containers.MempoolSeqEven
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -13,12 +14,13 @@ import lombok.extern.slf4j.Slf4j;
  * consumer a ZMQSequenceEventProcessor shares a blockingQueue.
  */
 @Slf4j
-public abstract class ZMQSequenceEventProcessor implements Runnable {
+public abstract class StoppableThread implements Runnable {
 
+    @Getter
     private boolean started = false;
+    @Getter
     private boolean finished = false;
     private Thread thread = null;
-    protected boolean endThread;
 
     @Autowired
     protected MempoolSeqEventQueueContainer blockingQueueContainer;
@@ -29,17 +31,28 @@ public abstract class ZMQSequenceEventProcessor implements Runnable {
     protected abstract void doYourThing() throws InterruptedException;
 
     public void start() {
-        if (finished)
-            throw new IllegalStateException("This class only accepts only one start");
+        if (finished) {
+            log.error("This class only accepts only one start");
+            return;
+        }
+        if (started) {
+            log.info("Thread already started");
+            return;
+        }
         thread = new Thread(this);
         thread.start();
         started = true;
     }
 
     public void shutdown() {
-        if (!started)
-            throw new IllegalStateException("This class is not started yet!");
-        endThread = true;
+        if (!started) {
+            log.error("This class is not started yet!");
+            return;
+        }
+        if (finished) {
+            log.info("Thread already finished");
+            return;
+        }
         thread.interrupt();// In case thread is waiting for something.
         finished = true;
     }

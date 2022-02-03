@@ -50,6 +50,6 @@
 	<logger name="com.mempoolexplorer.bitcoind.adapter.threads.ZMQSequenceEventConsumer" level="DEBUG" />
 	<logger name="com.mempoolexplorer.bitcoind.adapter.jobs.BlockTemplateRefresherJob" level="DEBUG" />
 	<logger name="com.mempoolexplorer.bitcoind.adapter.jobs.SmartFeesRefresherJob " level="DEBUG" />
-
+	<logger name="com.mempoolexplorer.bitcoind.adapter.jobs.BlockChainInfoRefresherJob " level="DEBUG" />
 
 </configuration>
