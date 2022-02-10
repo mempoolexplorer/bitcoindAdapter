@@ -24,7 +24,6 @@ import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetVerbose
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.RawMemPoolEntryData;
 import com.mempoolexplorer.bitcoind.adapter.components.alarms.AlarmLogger;
 import com.mempoolexplorer.bitcoind.adapter.components.clients.BitcoindClient;
-import com.mempoolexplorer.bitcoind.adapter.components.containers.bitcoindstate.BitcoindStateContainer;
 import com.mempoolexplorer.bitcoind.adapter.components.containers.txpool.TxPoolContainer;
 import com.mempoolexplorer.bitcoind.adapter.components.factories.exceptions.TxPoolException;
 import com.mempoolexplorer.bitcoind.adapter.components.factories.utils.TransactionFactory;
@@ -69,9 +68,6 @@ public class TxPoolFillerImpl implements TxPoolFiller {
 
     @Autowired
     private BlockFactory blockFactory;
-
-    @Autowired
-    private BitcoindStateContainer bitcoindStateContainer;
 
     @Override
     @ProfileTime(metricName = ProfileMetricNames.MEMPOOL_INITIAL_CREATION_TIME)

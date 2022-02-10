@@ -5,11 +5,13 @@ import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.EstimateSm
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockChainInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockTemplateResult;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetIndexInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolEntry;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetNetworkInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetRawMemPoolNonVerbose;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetRawMemPoolVerbose;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetTxOut;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetVerboseRawTransactionResult;
 
 public interface BitcoindClient {
@@ -37,4 +39,10 @@ public interface BitcoindClient {
 	GetBlockChainInfo getBlockChainInfo();
 
 	GetNetworkInfo getNetworkInfo();
+
+	GetTxOut getTxOut(String txId, int voutIndex);
+
+	GetVerboseRawTransactionResult getVerboseRawTransaction(String txId, String blockHash);
+
+	GetIndexInfo getIndexInfo();
 }

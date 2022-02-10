@@ -14,11 +14,13 @@ import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockCo
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockHashResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockResult;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockTemplateResult;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetIndexInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolEntry;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetMemPoolInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetNetworkInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetRawMemPoolNonVerbose;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetRawMemPoolVerbose;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetTxOut;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetVerboseRawTransactionResult;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,18 +177,56 @@ public class BitcoindClientImpl implements BitcoindClient {
 		stringParams.setParams(new ArrayList<>());
 
 		return restTemplate.postForObject("/", stringParams, GetBlockChainInfo.class);
-
 	}
 
 	@Override
 	public GetNetworkInfo getNetworkInfo() {
 		StringArrayParamRequest stringParams = new StringArrayParamRequest();
 
-		stringParams.setId("12");
+		stringParams.setId("13");
 		stringParams.setMethod("getnetworkinfo");
 		stringParams.setParams(new ArrayList<>());
 
 		return restTemplate.postForObject("/", stringParams, GetNetworkInfo.class);
+	}
 
+	@Override
+	public GetTxOut getTxOut(String txId, int voutIndex) {
+		ObjectArrayParamRequest objectParams = new ObjectArrayParamRequest();
+
+		objectParams.setId("14");
+		objectParams.setMethod("gettxout");
+		List<Object> params = new ArrayList<>();
+		params.add(txId);
+		params.add(Integer.valueOf(voutIndex));
+		objectParams.setParams(params);
+
+		return restTemplate.postForObject("/", objectParams, GetTxOut.class);
+	}
+
+	@Override
+	public GetVerboseRawTransactionResult getVerboseRawTransaction(String txId, String blockHash) {
+		ObjectArrayParamRequest objectParams = new ObjectArrayParamRequest();
+
+		objectParams.setId("15");
+		objectParams.setMethod("getrawtransaction");
+		List<Object> params = new ArrayList<>();
+		params.add(txId);
+		params.add(Boolean.valueOf(true));
+		params.add(blockHash);
+		objectParams.setParams(params);
+
+		return restTemplate.postForObject("/", objectParams, GetVerboseRawTransactionResult.class);
+	}
+
+	@Override
+	public GetIndexInfo getIndexInfo() {
+		StringArrayParamRequest stringParams = new StringArrayParamRequest();
+
+		stringParams.setId("16");
+		stringParams.setMethod("getindexinfo");
+		stringParams.setParams(new ArrayList<>());
+
+		return restTemplate.postForObject("/", stringParams, GetIndexInfo.class);
 	}
 }

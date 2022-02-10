@@ -1,7 +1,10 @@
 package com.mempoolexplorer.bitcoind.adapter.threads;
 
+import com.mempoolexplorer.bitcoind.adapter.BitcoindAdapterApplication;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockChainInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetBlockChainInfoData;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetIndexInfo;
+import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetIndexInfoData;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetNetworkInfo;
 import com.mempoolexplorer.bitcoind.adapter.bitcoind.entities.results.GetNetworkInfoData;
 import com.mempoolexplorer.bitcoind.adapter.components.clients.BitcoindClient;
@@ -36,6 +39,12 @@ public class MainThread extends StoppableThread {
 
     @Override
     protected void doYourThing() throws InterruptedException {
+        if (!checkIndexOk()) {
+            // Wait some time or exit will not work
+            Thread.sleep(10000);
+            BitcoindAdapterApplication.exit();// No comunication, force fail.
+            return;
+        }
         waitTillBitcoindStatusChecked();// Will wait until everything is ok
         log.info("bitcoinAdapter ZMQ receiver and consumer are starting...");
         log.info("bitcoinAdapter jobs are starting...");
@@ -66,6 +75,43 @@ public class MainThread extends StoppableThread {
         waitTillBlockChainInSync();
     }
 
+    private boolean checkIndexOk() throws InterruptedException {
+        log.info("Checking txIndex are available...");
+        boolean checked = false;
+        while (!checked && !Thread.interrupted()) {
+            GetIndexInfo ii = null;
+            try {
+                ii = bitcoindClient.getIndexInfo();
+            } catch (Exception e) {
+                log.error(e.toString());
+                log.error("Cannot check IndexInfo from bitcoind node");
+            }
+            if (ii != null) {
+                if (ii.getError() != null) {
+                    log.error("bitcoind returned error:{}", ii.getError());
+                } else {
+                    log.debug(ii.toString());
+                    checked = true;
+                    GetIndexInfoData data = ii.getGetIndexInfoData();
+                    if (data.getTxindex() == null) {
+                        log.error(
+                                "Bitcoind has no -txIndex option enabled, you MUST have that option to work properly.");
+                        log.error("Consider adding -txindex=1 to bitcoin.conf file.");
+                        return false;
+                    } else {
+                        log.info("Bitcoind has txindex enabled.");
+                        return true;
+                    }
+                }
+            }
+            if (!checked) {
+                log.info("Waiting 1 minute...");
+                Thread.sleep(60000);
+            }
+        }
+        return false;
+    }
+
     private void waitTillMinNetworkPeers() throws InterruptedException {
         log.info("Checking NetworkInfo from bitcoind");
         boolean checked = false;
@@ -81,6 +127,7 @@ public class MainThread extends StoppableThread {
                 if (nti.getError() != null) {
                     log.error("bitcoind returned error:{}", nti.getError());
                 } else {
+                    log.debug(nti.toString());
                     GetNetworkInfoData data = nti.getGetNetworkInfoData();
                     blockChainStateContainer.setNetworkInfoData(data);
                     if (data.isNetworkactive() && data.getConnections_out() >= 2) {
@@ -113,6 +160,7 @@ public class MainThread extends StoppableThread {
                 if (bci.getError() != null) {
                     log.error("bitcoind returned error:{}", bci.getError());
                 } else {
+                    log.debug(bci.toString());
                     GetBlockChainInfoData data = bci.getGetBlockChainInfoData();
                     blockChainStateContainer.setBlockChainInfoData(data);
                     if (data.isInitialblockdownload() == false) {

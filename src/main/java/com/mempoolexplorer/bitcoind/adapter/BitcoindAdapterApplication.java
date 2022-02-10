@@ -16,6 +16,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @SpringBootApplication
 public class BitcoindAdapterApplication {
 
@@ -32,7 +35,10 @@ public class BitcoindAdapterApplication {
 	}
 
 	public static void exit() {
-		SpringApplication.exit(springAppContext, () -> 1);
+		log.warn("Exitting bitcoindAdapter.");
+		if (springAppContext != null) {
+			SpringApplication.exit(springAppContext, () -> 1);
+		}
 	}
 
 	@Bean
