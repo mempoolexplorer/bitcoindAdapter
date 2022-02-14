@@ -67,6 +67,8 @@ public class SmartFeesRefresherJob {
 
     // Search for the whole list of target blocks (up to 1008), but can stop if
     // Sat/VByte ==1 or is not a valid estimation (targetBlock>blocks)
+    // EstimateSmartFeeResult(smartFees=EstimateSmartFeeData(feerate=null,
+    // blocks=2))
     private void fillSmartFees(List<SmartFee> smartFees, EstimateType estimateType) {
         smartFees.clear();
         int blockIndex = 1;
@@ -74,7 +76,17 @@ public class SmartFeesRefresherJob {
         while (blockIndex <= 1008 && lastSatVByte.compareTo(Double.valueOf(1d)) >= 0) {
             EstimateSmartFeeResult estimateSmartFeeResult = bitcoindClient.estimateSmartFee(estimateType,
                     blockIndex);
+            if (estimateSmartFeeResult.getError() != null) {
+                log.debug(estimateSmartFeeResult.toString());
+                log.error("Error estimating fees: " + estimateSmartFeeResult.getError().toString());
+                bitcoindCommunicationChecker.addFail();
+                return;
+            }
             EstimateSmartFeeData estimateSmartFeeData = estimateSmartFeeResult.getSmartFees();
+            if (estimateSmartFeeData.getFeerate() == null) {
+                log.warn("There is not enough data to calculate smartFees. No data will be provided.");
+                return;
+            }
             if (blockIndex > estimateSmartFeeData.getBlocks()) {
                 break;
             }

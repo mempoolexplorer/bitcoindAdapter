@@ -384,10 +384,11 @@ public class TxPoolFillerImpl implements TxPoolFiller {
     private void addPoolChangesFromNewTxs(TxPoolChanges txpc, List<String> blockTxsList) {
         for (String txIdInBlock : blockTxsList) {
             Transaction txInBlock = loadTransaction(txIdInBlock);
-            // This can't happen
+            // This happens for coinbaseTx and tx not in mempool. Be aware that we receive
+            // block disconnections and then tx from disconnected block that are not in our
+            // mempool.
             if (txInBlock == null) {
-                log.error("TxId {} in disconnected block, not found", txIdInBlock);
-                alarmLogger.addAlarm("TxId " + txIdInBlock + " in disconnected block, not found");
+                log.info("TxId {} in disconnected block, not found", txIdInBlock);
                 continue;
             }
             txpc.getNewTxs().add(txInBlock);
