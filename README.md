@@ -1,3 +1,6 @@
+# This is an abandoned project. 
+# See https://github.com/mempoolexplorer/mempool-explorer-back for a self-hosted version.
+
 # BitcoindAdapter
 
 This is a spring boot project to mantain a REST-queriable memPool, and send new transactions and blocks via kafka message broker.
